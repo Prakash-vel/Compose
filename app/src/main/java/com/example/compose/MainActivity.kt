@@ -17,24 +17,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color.Companion.Cyan
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -121,8 +115,11 @@ fun MasterContainer(navController: NavController, context: Context) {
                     onClick = {
                         scope.launch { scaffoldState.drawerState.open() }
                     }
-                ){
-                    Icon(painterResource(id = R.drawable.ic_baseline_menu_24), contentDescription =null )
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.ic_baseline_menu_24),
+                        contentDescription = null
+                    )
                 }
             },
             actions = {
@@ -132,7 +129,7 @@ fun MasterContainer(navController: NavController, context: Context) {
 //                        contentDescription = null
 //                    )
 //                }
-                IconButton(onClick = {  }) {
+                IconButton(onClick = { }) {
                     Icon(Icons.Default.Search, contentDescription = null)
                 }
             }
@@ -189,14 +186,16 @@ fun MasterContainer(navController: NavController, context: Context) {
                 ExtendedFloatingActionButton(
                     text = { Text("Add") },
                     onClick = { navController.navigate("addingContainer") },
-                    icon = {Icon(
-                        painterResource(id = R.drawable.ic_baseline_person_add_alt_1_24),
-                        contentDescription = null
-                    )},
+                    icon = {
+                        Icon(
+                            painterResource(id = R.drawable.ic_baseline_person_add_alt_1_24),
+                            contentDescription = null
+                        )
+                    },
                 )
             },
             content = {
-                Column() {
+                Column {
 
                     val scrollState = rememberLazyListState()
                     LazyColumn(
@@ -269,58 +268,61 @@ fun SetName(name: String) {
     Text(text = name)
 }
 
-@ExperimentalComposeUiApi
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview(viewModel: MasterViewModel = viewModel()) {
-    var query = ""
-    ComposeTheme {
+//@ExperimentalComposeUiApi
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview(viewModel: MasterViewModel = viewModel()) {
+//    var query = ""
+//    ComposeTheme {
+//
+//
+//    }
+//}
 
-
-    }
-}
-
-@Composable
-fun dummy(navController: NavController,appName: String){
-    val scaffoldState = rememberScaffoldState()
-    val scope = rememberCoroutineScope()
-    Scaffold(
-        scaffoldState = scaffoldState,
-        drawerContent = { Text("Drawer content") },
-        topBar = {
-
-            TopAppBar(
-                title = { Text("Top app bar") },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            scope.launch { scaffoldState.drawerState.open() }
-                        }
-                    ) {
-                        Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.app_name))
-                    }
-                }
-            )
-        },
-        floatingActionButtonPosition = FabPosition.End,
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text("Extended FAB") },
-                onClick = { /* Handle FAB click */ }
-            )
-        },
-        content = { innerPadding ->
-            LazyColumn(contentPadding = innerPadding) {
-                items(count = 20) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .padding(16.dp)
-                    ) { /* Card content */ }
-                }
-            }
-        }
-    )
-}
+//@Composable
+//fun dummy(navController: NavController, appName: String) {
+//    val scaffoldState = rememberScaffoldState()
+//    val scope = rememberCoroutineScope()
+//    Scaffold(
+//        scaffoldState = scaffoldState,
+//        drawerContent = { Text("Drawer content") },
+//        topBar = {
+//
+//            TopAppBar(
+//                title = { Text("Top app bar") },
+//                navigationIcon = {
+//                    IconButton(
+//                        onClick = {
+//                            scope.launch { scaffoldState.drawerState.open() }
+//                        }
+//                    ) {
+//                        Icon(
+//                            Icons.Filled.Menu,
+//                            contentDescription = stringResource(R.string.app_name)
+//                        )
+//                    }
+//                }
+//            )
+//        },
+//        floatingActionButtonPosition = FabPosition.End,
+//        floatingActionButton = {
+//            ExtendedFloatingActionButton(
+//                text = { Text("Extended FAB") },
+//                onClick = { /* Handle FAB click */ }
+//            )
+//        },
+//        content = { innerPadding ->
+//            LazyColumn(contentPadding = innerPadding) {
+//                items(count = 20) {
+//                    Card(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .wrapContentHeight()
+//                            .padding(16.dp)
+//                    ) { /* Card content */ }
+//                }
+//            }
+//        }
+//    )
+//}
 
