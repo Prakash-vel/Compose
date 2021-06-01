@@ -24,7 +24,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color.Companion.Cyan
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,7 +57,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-//        val viewModel: MasterViewModel by rem
 
     }
 
@@ -77,39 +78,33 @@ fun MainUi(context: Context) {
             AddingContainer()
         }
     }
-//    Column(content = { MasterContainer(context = context) })
 }
 
-@Composable
-fun DetailContainer() {
-    Text(text = "This is the Detail screen")
-}
 
-@Composable
-fun AddingContainer() {
-    Text("this is the adding screen")
-}
+
 
 
 @Composable
 fun MasterContainer(navController: NavController, context: Context) {
     val viewModel: MasterViewModel = viewModel()
     val appName = context.resources.getString(R.string.app_name)
-    //dummy(navController = navController, appName = appName)
-
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val query by viewModel.data.observeAsState("Search")
+    val searchEnabled by viewModel.searchState.observeAsState("false")
+
 
     Column(
         modifier = Modifier
+            .background(Teal200)
             .fillMaxHeight()
             .fillMaxWidth()
             .background(Teal200)
+
     ) {
         TopAppBar(
             backgroundColor = Teal200,
-            title = { SetName(name = appName) },
-//            elevation = 4.dp,
+            title = { Text(text = appName) },
             navigationIcon = {
                 IconButton(
                     onClick = {
@@ -129,54 +124,75 @@ fun MasterContainer(navController: NavController, context: Context) {
 //                        contentDescription = null
 //                    )
 //                }
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    viewModel.searchEnable(state = true)
+                }) {
                     Icon(Icons.Default.Search, contentDescription = null)
                 }
             }
 
         )
-        val query by viewModel.data.observeAsState("Search")
-        Box(
-            Modifier
-                .background(Purple200)
-                .fillMaxWidth()
-                .height(65.dp)
-        ) {
+       if(searchEnabled==true){
+           Box(
+               Modifier
+                   .background(Teal200)
+                   .fillMaxWidth()
+                   .height(65.dp)
+           ) {
+               val focusManager = LocalFocusManager.current
+               OutlinedTextField(
+                   modifier= Modifier
+                       .fillMaxWidth()
+                       .padding(3.dp),
+                   value = query,
+                   onValueChange = { viewModel.search(it) },
+                   leadingIcon = {
+                       IconButton(onClick = {
+                           focusManager.clearFocus()
+                           viewModel.searchEnable(false)
+                       }) {
+                           Icon(
+                               imageVector = Icons.Filled.Search,
+                               contentDescription = null
+                           )
+                       }
+                   },
+                   trailingIcon = {
+                       IconButton(onClick = {
+                           focusManager.clearFocus()
+                           if(query.isEmpty()){
+                               viewModel.searchEnable(false)
+                           }
+                           viewModel.search("")
+                       }) {
+                           Icon(
+                               imageVector = Icons.Filled.Close,
+                               contentDescription = null
+                           )
+                       }
+                   },
+                   label = {
+                       Text(text = "Search")
+                   },
+                   placeholder = {
+                       Text(text = "type a name or number")
+                   },
+                   keyboardOptions = KeyboardOptions(
+                       keyboardType = KeyboardType.Text,
+                       imeAction = ImeAction.Search,
+                   ),
+                   keyboardActions = KeyboardActions(onSearch = {
+                       viewModel.search(query)
+                       focusManager.clearFocus()
 
-            OutlinedTextField(
-                value = query,
-                onValueChange = { viewModel.search(it) },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Filled.Search, contentDescription = null)
-                },
-                trailingIcon = {
-                    IconButton(onClick = {
+                   })
 
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = null
-                        )
-                    }
-                },
-                label = {
-                    Text(text = "Search")
-                },
-                placeholder = {
-                    Text(text = "type a name or number")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Search,
-                ), keyboardActions = KeyboardActions(onSearch = {
-                    viewModel.search(query)
-                    this.defaultKeyboardAction(imeAction = ImeAction.Search)
+               )
 
-                })
+           }
+       }
 
-            )
 
-        }
 
         Scaffold(
             scaffoldState = scaffoldState,
@@ -194,8 +210,10 @@ fun MasterContainer(navController: NavController, context: Context) {
                     },
                 )
             },
+            contentColor = contentColorFor(backgroundColor = Teal200),
             content = {
-                Column {
+                Column(Modifier.fillMaxHeight()
+                    .background(Teal200)) {
 
                     val scrollState = rememberLazyListState()
                     LazyColumn(
@@ -205,11 +223,12 @@ fun MasterContainer(navController: NavController, context: Context) {
                             .clip(RoundedCornerShape(10.dp))
                     ) {
 
-                        items(10) {
+                        items(30) {
                             Card(navController)
 
                         }
                     }
+
                 }
             }
         )
@@ -262,11 +281,6 @@ fun Card(navController: NavController) {
     }
 }
 
-
-@Composable
-fun SetName(name: String) {
-    Text(text = name)
-}
 
 //@ExperimentalComposeUiApi
 //@Preview(showBackground = true)

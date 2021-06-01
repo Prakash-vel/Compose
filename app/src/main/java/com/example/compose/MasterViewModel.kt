@@ -15,4 +15,12 @@ class MasterViewModel: ViewModel() {
     fun search(query: String){
         _data.value=query
     }
+
+    private val _searchState=MutableLiveData<Boolean>()
+    val searchState:LiveData<Boolean>
+        get()=_searchState
+
+    fun searchEnable(state: Boolean){
+        _searchState.value=state
+    }
 }
