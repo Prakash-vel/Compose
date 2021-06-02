@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -24,7 +25,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -39,7 +39,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.ui.theme.ComposeTheme
-import com.example.compose.ui.theme.Purple200
 import com.example.compose.ui.theme.Teal200
 import kotlinx.coroutines.launch
 
@@ -63,6 +62,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var context: Context
 
 }
+lateinit var appName: String
 
 @Composable
 fun MainUi(context: Context) {
@@ -72,22 +72,19 @@ fun MainUi(context: Context) {
             MasterContainer(context = context, navController = navController)
         }
         composable("detailContainer") {
-            DetailContainer()
+            DetailContainer(context = context, navController = navController)
         }
         composable("addingContainer") {
-            AddingContainer()
+            AddingContainer(context = context, navController = navController)
         }
     }
 }
 
 
-
-
-
 @Composable
 fun MasterContainer(navController: NavController, context: Context) {
     val viewModel: MasterViewModel = viewModel()
-    val appName = context.resources.getString(R.string.app_name)
+    appName = context.resources.getString(R.string.app_name)
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val query by viewModel.data.observeAsState("Search")
@@ -132,65 +129,65 @@ fun MasterContainer(navController: NavController, context: Context) {
             }
 
         )
-       if(searchEnabled==true){
-           Box(
-               Modifier
-                   .background(Teal200)
-                   .fillMaxWidth()
-                   .height(65.dp)
-           ) {
-               val focusManager = LocalFocusManager.current
-               OutlinedTextField(
-                   modifier= Modifier
-                       .fillMaxWidth()
-                       .padding(3.dp),
-                   value = query,
-                   onValueChange = { viewModel.search(it) },
-                   leadingIcon = {
-                       IconButton(onClick = {
-                           focusManager.clearFocus()
-                           viewModel.searchEnable(false)
-                       }) {
-                           Icon(
-                               imageVector = Icons.Filled.Search,
-                               contentDescription = null
-                           )
-                       }
-                   },
-                   trailingIcon = {
-                       IconButton(onClick = {
-                           focusManager.clearFocus()
-                           if(query.isEmpty()){
-                               viewModel.searchEnable(false)
-                           }
-                           viewModel.search("")
-                       }) {
-                           Icon(
-                               imageVector = Icons.Filled.Close,
-                               contentDescription = null
-                           )
-                       }
-                   },
-                   label = {
-                       Text(text = "Search")
-                   },
-                   placeholder = {
-                       Text(text = "type a name or number")
-                   },
-                   keyboardOptions = KeyboardOptions(
-                       keyboardType = KeyboardType.Text,
-                       imeAction = ImeAction.Search,
-                   ),
-                   keyboardActions = KeyboardActions(onSearch = {
-                       viewModel.search(query)
-                       focusManager.clearFocus()
+        if (searchEnabled == true) {
+            Box(
+                Modifier
+                    .background(Teal200)
+                    .fillMaxWidth()
+                    .height(65.dp)
+            ) {
+                val focusManager = LocalFocusManager.current
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(3.dp),
+                    value = query,
+                    onValueChange = { viewModel.search(it) },
+                    leadingIcon = {
+                        IconButton(onClick = {
+                            focusManager.clearFocus()
+                            viewModel.searchEnable(false)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = {
+                            focusManager.clearFocus()
+                            if (query.isEmpty()) {
+                                viewModel.searchEnable(false)
+                            }
+                            viewModel.search("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    label = {
+                        Text(text = "Search")
+                    },
+                    placeholder = {
+                        Text(text = "type a name or number")
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Search,
+                    ),
+                    keyboardActions = KeyboardActions(onSearch = {
+                        viewModel.search(query)
+                        focusManager.clearFocus()
 
-                   })
+                    })
 
-               )
+                )
 
-           }
-       }
+            }
+        }
 
 
 
@@ -212,8 +209,11 @@ fun MasterContainer(navController: NavController, context: Context) {
             },
             contentColor = contentColorFor(backgroundColor = Teal200),
             content = {
-                Column(Modifier.fillMaxHeight()
-                    .background(Teal200)) {
+                Column(
+                    Modifier
+                        .fillMaxHeight()
+                        .background(Teal200)
+                ) {
 
                     val scrollState = rememberLazyListState()
                     LazyColumn(
@@ -235,6 +235,7 @@ fun MasterContainer(navController: NavController, context: Context) {
     }
 
 }
+
 
 
 @Composable
@@ -279,6 +280,23 @@ fun Card(navController: NavController) {
 
 
     }
+}
+@Composable
+fun secondaryToolbar(navController: NavController){
+
+   TopAppBar(
+       backgroundColor = Teal200,
+       title = { Text(text = appName) },
+       navigationIcon = {
+           IconButton(
+               onClick = {
+                   navController.backQueue
+               }
+           ) {
+               Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null
+               )
+           }
+       },)
 }
 
 
