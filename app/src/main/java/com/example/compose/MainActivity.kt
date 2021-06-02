@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.Cyan
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
 }
 lateinit var appName: String
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MainUi(context: Context) {
     val navController = rememberNavController()
@@ -282,7 +284,7 @@ fun Card(navController: NavController) {
     }
 }
 @Composable
-fun secondaryToolbar(navController: NavController){
+fun SecondaryToolbar(navController: NavController){
 
    TopAppBar(
        backgroundColor = Teal200,
@@ -290,7 +292,7 @@ fun secondaryToolbar(navController: NavController){
        navigationIcon = {
            IconButton(
                onClick = {
-                   navController.backQueue
+                   navController.popBackStack()
                }
            ) {
                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null
