@@ -23,22 +23,45 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.compose.data.ContactData
 import com.example.compose.ui.theme.Teal200
 
 @ExperimentalComposeUiApi
 @Composable
-fun AddingContainer(context: Context, navController: NavHostController) {
+fun AddingContainer(context: Context, navController: NavHostController,contactId: Long =0L) {
     val focusRequester = FocusRequester.createRefs()
     val f1 = focusRequester.component1()
     val f2 = focusRequester.component2()
     val f3 = focusRequester.component3()
     val f4 = focusRequester.component4()
     val f5 = focusRequester.component5()
-    val viewModel: AddingViewModel = viewModel()
+    val viewModel: AddingViewModel = hiltViewModel()
     val scrollState = rememberScrollState()
-    val name by viewModel.data.observeAsState(initial = "")
+    if(contactId != 0L){
+        viewModel.initData(contactId)
+    }
+    val selectedData by viewModel.selectedData.observeAsState()
+    val fName by if (contactId == 0L) viewModel.fName.observeAsState("") else viewModel.fName.observeAsState(
+        selectedData?.contactFirstName
+    )
+    val lName by if (contactId == 0L) viewModel.lName.observeAsState("") else viewModel.fName.observeAsState(
+        selectedData?.contactFirstName
+    )
+    val cCode by if (contactId == 0L) viewModel.cCode.observeAsState("") else viewModel.fName.observeAsState(
+        selectedData?.contactFirstName
+    )
+    val  pNum by if (contactId == 0L) viewModel.pNum.observeAsState("") else viewModel.fName.observeAsState(
+        selectedData?.contactFirstName
+    )
+    val eMail by if (contactId == 0L) viewModel.eMail.observeAsState("") else viewModel.fName.observeAsState(
+        selectedData?.contactFirstName
+    )
+
+
+
 
     Column(
         modifier = Modifier
@@ -92,9 +115,9 @@ fun AddingContainer(context: Context, navController: NavHostController) {
                         .padding(10.dp)
                         .fillMaxWidth()
                         .focusRequester(f1),
-                    value = name,
+                    value = fName!!,
                     onValueChange = {
-                        viewModel.search(it)
+                        viewModel.inputFN(it)
                     },
                     label = {
                         Text(text = "First Name")
@@ -118,9 +141,9 @@ fun AddingContainer(context: Context, navController: NavHostController) {
                         .padding(10.dp)
                         .fillMaxWidth()
                         .focusRequester(f2),
-                    value = name,
+                    value = lName!!,
                     onValueChange = {
-                        viewModel.search(it)
+                        viewModel.inputLN(it)
                     },
                     label = {
                         Text(text = "Last Name")
@@ -145,9 +168,9 @@ fun AddingContainer(context: Context, navController: NavHostController) {
                             .padding(10.dp)
                             .width(100.dp)
                             .focusRequester(f3),
-                        value = name,
+                        value = cCode!!,
                         onValueChange = {
-                            viewModel.search(it)
+                            viewModel.inputCC(it)
                         },
                         label = {
                             Text(text = "Code")
@@ -169,9 +192,9 @@ fun AddingContainer(context: Context, navController: NavHostController) {
                             .padding(10.dp)
                             .fillMaxWidth()
                             .focusRequester(f4),
-                        value = name,
+                        value = pNum!!,
                         onValueChange = {
-                            viewModel.search(it)
+                            viewModel.inputPN(it)
                         },
                         label = {
                             Text(text = "Phone Number")
@@ -200,9 +223,9 @@ fun AddingContainer(context: Context, navController: NavHostController) {
                             .padding(10.dp)
                             .fillMaxWidth()
                             .focusRequester(f5),
-                        value = name,
+                        value = eMail!!,
                         onValueChange = {
-                            viewModel.search(it)
+                            viewModel.inputEM(it)
                         },
                         label = {
                             Text(text = "E Mail")
@@ -237,7 +260,9 @@ fun AddingContainer(context: Context, navController: NavHostController) {
                     Text("Cancel")
                 }
                 Button(
-                    onClick = { navController.popBackStack() },
+                    onClick = {
+                        viewModel.update(id = contactId)
+                        navController.popBackStack() },
                     modifier = Modifier.padding(start = 10.dp)
                 ) {
                     Text("Add")

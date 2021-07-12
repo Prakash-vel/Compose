@@ -2,6 +2,7 @@ package com.example.compose
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -34,19 +35,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.compose.data.ContactData
 import com.example.compose.ui.theme.ComposeTheme
 import com.example.compose.ui.theme.Teal200
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try{
 
         setContent {
             ComposeTheme {
@@ -57,12 +63,16 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        }catch (e:Exception){
+            Log.i("hello", "onCreate: error $e")
+        }
 
     }
 
     private lateinit var context: Context
 
 }
+
 lateinit var appName: String
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -71,6 +81,7 @@ fun MainUi(context: Context) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "masterContainer") {
         composable("masterContainer") {
+
             MasterContainer(context = context, navController = navController)
         }
         composable("detailContainer") {
@@ -80,18 +91,24 @@ fun MainUi(context: Context) {
             AddingContainer(context = context, navController = navController)
         }
     }
+    Log.i("hello", "onCreate: error ")
 }
 
 
+@ExperimentalComposeUiApi
 @Composable
 fun MasterContainer(navController: NavController, context: Context) {
-    val viewModel: MasterViewModel = viewModel()
+
+    val viewModel: MasterViewModel = hiltViewModel()
+
     appName = context.resources.getString(R.string.app_name)
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val query by viewModel.data.observeAsState("Search")
+    val query by viewModel.query.observeAsState("")
+//    val data by viewModel.data.observeAsState()
     val searchEnabled by viewModel.searchState.observeAsState("false")
-
+//    val  focusRequester=FocusRequester.createRefs()
+//    val focusObject=focusRequester.component1()
 
     Column(
         modifier = Modifier
@@ -125,6 +142,7 @@ fun MasterContainer(navController: NavController, context: Context) {
 //                }
                 IconButton(onClick = {
                     viewModel.searchEnable(state = true)
+//                    focusObject.requestFocus()
                 }) {
                     Icon(Icons.Default.Search, contentDescription = null)
                 }
@@ -189,6 +207,7 @@ fun MasterContainer(navController: NavController, context: Context) {
                 )
 
             }
+
         }
 
 
@@ -230,14 +249,12 @@ fun MasterContainer(navController: NavController, context: Context) {
 
                         }
                     }
-
                 }
             }
         )
     }
 
 }
-
 
 
 @Composable
@@ -283,22 +300,25 @@ fun Card(navController: NavController) {
 
     }
 }
-@Composable
-fun SecondaryToolbar(navController: NavController){
 
-   TopAppBar(
-       backgroundColor = Teal200,
-       title = { Text(text = appName) },
-       navigationIcon = {
-           IconButton(
-               onClick = {
-                   navController.popBackStack()
-               }
-           ) {
-               Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null
-               )
-           }
-       },)
+@Composable
+fun SecondaryToolbar(navController: NavController) {
+
+    TopAppBar(
+        backgroundColor = Teal200,
+        title = { Text(text = appName) },
+        navigationIcon = {
+            IconButton(
+                onClick = {
+                    navController.popBackStack()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack, contentDescription = null
+                )
+            }
+        },
+    )
 }
 
 

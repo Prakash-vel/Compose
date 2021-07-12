@@ -3,18 +3,28 @@ package com.example.compose
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.compose.data.ContactData
+import com.example.compose.data.Repository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class MasterViewModel: ViewModel() {
+@HiltViewModel
+class MasterViewModel @Inject constructor(val repository: Repository): ViewModel() {
 
-    private val _data=MutableLiveData<String>()
-    val data:LiveData<String>
-       get()=_data
-    init{
-        _data.value="search"
-    }
+//    lateinit var repository: Repository
+    val data: MutableLiveData<List<ContactData>>
+       get()=repository.resultData
+
     fun search(query: String){
-        _data.value=query
+        _query.value=query
+        repository.getContact(query)
     }
+
+    private val _query=MutableLiveData<String>()
+    val query:LiveData<String>
+        get()=_query
+
+
 
     private val _searchState=MutableLiveData<Boolean>()
     val searchState:LiveData<Boolean>
